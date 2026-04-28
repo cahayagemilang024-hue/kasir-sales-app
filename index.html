@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="manifest.json">
+  <title>Aplikasi Kasir dan Sales</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <h1>Aplikasi Kasir & Sales Lapangan</h1>
+        <p>Versi awal - buka di browser untuk mulai.</p>
+      </div>
+      <nav>
+        <button onclick="showPage('kasir')">Kasir</button>
+        <button onclick="showPage('sales')">Sales</button>
+        <button onclick="showPage('produk')">Produk</button>
+        <button onclick="showPage('laporan')">Laporan</button>
+      </nav>
+    </header>
+
+    <main>
+      <section id="kasir" class="page active">
+        <h2>Kasir</h2>
+        <div class="panel-row">
+          <div class="panel">
+            <h3>Input Transaksi</h3>
+            <select id="kasir-produk" onchange="updateKasirHarga()"></select>
+            <input id="kasir-qty" type="number" value="1" min="1" onchange="updateKasirHarga()">
+            <div class="field">
+              <label>Total Harga</label>
+              <span id="kasir-total">Rp 0</span>
+            </div>
+            <button onclick="addKasirItem()">Tambah ke Nota</button>
+          </div>
+          <div class="panel">
+            <h3>Nota</h3>
+            <ul id="nota-list"></ul>
+            <div class="field">
+              <label>Jumlah Bayar</label>
+              <input id="kasir-bayar" type="number" value="0" min="0" oninput="renderKasirSummary()">
+            </div>
+            <div class="field">
+              <label>Subtotal</label>
+              <span id="kasir-subtotal">Rp 0</span>
+            </div>
+            <div class="field">
+              <label>Kembalian</label>
+              <span id="kasir-change">Rp 0</span>
+            </div>
+            <button onclick="completeTransaction()">Selesai Transaksi</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="sales" class="page">
+        <h2>Sales Lapangan</h2>
+        <div class="panel-row">
+          <div class="panel">
+            <h3>Order Baru</h3>
+            <input id="order-customer" type="text" placeholder="Nama pelanggan">
+            <select id="order-product" onchange="updateOrderHarga()"></select>
+            <input id="order-qty" type="number" value="1" min="1" onchange="updateOrderHarga()">
+            <div class="field">
+              <label>Total Order</label>
+              <span id="order-total">Rp 0</span>
+            </div>
+            <button onclick="addFieldOrder()">Simpan Order</button>
+          </div>
+          <div class="panel">
+            <h3>Daftar Order</h3>
+            <ul id="order-list"></ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="produk" class="page">
+        <h2>Produk & Stok</h2>
+        <div class="panel-row">
+          <div class="panel">
+            <h3>Tambah Produk</h3>
+            <input id="product-name" type="text" placeholder="Nama produk">
+            <input id="product-price" type="number" placeholder="Harga" min="0">
+            <input id="product-stock" type="number" placeholder="Stok" min="0">
+            <button onclick="addProduct()">Tambah Produk</button>
+          </div>
+          <div class="panel full-panel">
+            <h3>Daftar Produk</h3>
+            <table>
+              <thead><tr><th>Produk</th><th>Harga</th><th>Stok</th></tr></thead>
+              <tbody id="product-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="laporan" class="page">
+        <h2>Laporan</h2>
+        <div class="panel-row">
+          <div class="panel">
+            <h3>Ringkasan</h3>
+            <div class="field"><label>Total Transaksi</label><span id="report-transactions">0</span></div>
+            <div class="field"><label>Total Penjualan</label><span id="report-sales">Rp 0</span></div>
+            <div class="field"><label>Order Sales</label><span id="report-orders">0</span></div>
+          </div>
+          <div class="panel full-panel">
+            <h3>Produk Stok Rendah</h3>
+            <ul id="low-stock"></ul>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="script.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('Service Worker registered'))
+        .catch(err => console.log('Service Worker registration failed'));
+    }
+  </script>
+</body>
+</html>
