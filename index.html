@@ -90,7 +90,7 @@
           <div class="panel full-panel">
             <h3>Daftar Produk</h3>
             <table>
-              <thead><tr><th>Produk</th><th>Harga</th><th>Stok</th></tr></thead>
+              <thead><tr><th>Produk</th><th>Harga</th><th>Stok</th><th>Aksi</th></tr></thead>
               <tbody id="product-table"></tbody>
             </table>
           </div>
@@ -114,6 +114,21 @@
       </section>
     </main>
   </div>
+
+  <div id="editModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; padding:20px;" onclick="if(event.target.id === 'editModal') closeEditModal();">
+    <div style="background:white; max-width:400px; margin:50px auto; padding:20px; border-radius:12px;">
+      <h3>Edit Produk</h3>
+      <input id="editProductId" type="hidden">
+      <input id="editProductName" type="text" placeholder="Nama produk" style="width:100%; padding:10px; margin:10px 0; border:1px solid #ddd; border-radius:8px;">
+      <input id="editProductPrice" type="number" placeholder="Harga" min="0" style="width:100%; padding:10px; margin:10px 0; border:1px solid #ddd; border-radius:8px;">
+      <input id="editProductStock" type="number" placeholder="Stok" min="0" style="width:100%; padding:10px; margin:10px 0; border:1px solid #ddd; border-radius:8px;">
+      <div style="display:flex; gap:10px; margin-top:20px;">
+        <button onclick="saveEditProduct()" style="flex:1; padding:10px; background:#1FAD8A; color:white; border:none; border-radius:8px; cursor:pointer;">Simpan</button>
+        <button onclick="closeEditModal()" style="flex:1; padding:10px; background:#999; color:white; border:none; border-radius:8px; cursor:pointer;">Batal</button>
+      </div>
+    </div>
+  </div>
+
   <script src="script.js"></script>
   <script>
     if ('serviceWorker' in navigator) {

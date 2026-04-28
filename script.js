@@ -39,7 +39,15 @@ function renderProducts() {
     selectOrder.appendChild(option2);
 
     const row = document.createElement('tr');
-    row.innerHTML = `<td>${product.name}</td><td>${formatRp(product.price)}</td><td>${product.stock}</td>`;
+    row.innerHTML = `
+      <td>${product.name}</td>
+      <td>${formatRp(product.price)}</td>
+      <td>${product.stock}</td>
+      <td>
+        <button onclick="openEditModal(${product.id})" style="padding:5px 10px; background:#276EF1; color:white; border:none; border-radius:6px; cursor:pointer; margin-right:5px;">Edit</button>
+        <button onclick="deleteProduct(${product.id})" style="padding:5px 10px; background:#f44336; color:white; border:none; border-radius:6px; cursor:pointer;">Hapus</button>
+      </td>
+    `;
     tableBody.appendChild(row);
   });
 
@@ -186,6 +194,54 @@ function renderReport() {
     li.textContent = `${item.name} - Stok ${item.stock}`;
     list.appendChild(li);
   });
+}
+
+function openEditModal(productId) {
+  const product = products.find(p => p.id === productId);
+  if (!product) return;
+  
+  document.getElementById('editProductId').value = productId;
+  document.getElementById('editProductName').value = product.name;
+  document.getElementById('editProductPrice').value = product.price;
+  document.getElementById('editProductStock').value = product.stock;
+  document.getElementById('editModal').style.display = 'block';
+}
+
+function closeEditModal() {
+  document.getElementById('editModal').style.display = 'none';
+}
+
+function saveEditProduct() {
+  const productId = Number(document.getElementById('editProductId').value);
+  const name = document.getElementById('editProductName').value.trim();
+  const price = Number(document.getElementById('editProductPrice').value);
+  const stock = Number(document.getElementById('editProductStock').value);
+
+  if (!name || price <= 0 || stock < 0) {
+    alert('Isi nama, harga, dan stok dengan benar.');
+    return;
+  }
+
+  const product = products.find(p => p.id === productId);
+  if (product) {
+    product.name = name;
+    product.price = price;
+    product.stock = stock;
+  }
+
+  closeEditModal();
+  renderProducts();
+  renderReport();
+  saveData();
+}
+
+function deleteProduct(productId) {
+  if (!confirm('Yakin hapus produk ini?')) return;
+  
+  products = products.filter(p => p.id !== productId);
+  renderProducts();
+  renderReport();
+  saveData();
 }
 
 renderProducts();
