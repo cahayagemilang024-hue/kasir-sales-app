@@ -1,15 +1,97 @@
-let products = JSON.parse(localStorage.getItem('products')) || [
-  { id: 1, name: 'Produk A', price: 15000, stock: 20 },
-  { id: 2, name: 'Produk B', price: 28000, stock: 15 },
-  { id: 3, name: 'Produk C', price: 12000, stock: 30 },
-];
-let notaItems = JSON.parse(localStorage.getItem('notaItems')) || [];
-let orders = JSON.parse(localStorage.getItem('orders')) || [];
+// Firebase Configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyDc8GFhjJlPC9LoEMD9KgfpPnyb_cYbx88",
+  authDomain: "kasir-sales-app.firebaseapp.com",
+  databaseURL: "https://kasir-sales-app-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "kasir-sales-app",
+  storageBucket: "kasir-sales-app.firebasestorage.app",
+  messagingSenderId: "1023810043385",
+  appId: "1:1023810043385:web:bdfdaea411674f46511128",
+  measurementId: "G-4SM4KDK1MV"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+let products = [];
+let notaItems = [];
+let orders = [];
+let syncEnabled = false;
+
+async function loadDataFromFirestore() {
+  try {
+    // Load Products
+    const productsSnapshot = await db.collection('products').get();
+    products = [];
+    productsSnapshot.forEach(doc => {
+      products.push({ id: doc.id, ...doc.data() });
+    });
+
+    // Load Orders
+    const ordersSnapshot = await db.collection('orders').get();
+    orders = [];
+    ordersSnapshot.forEach(doc => {
+      orders.push({ id: doc.id, ...doc.data() });
+    });
+
+    // Load Nota Items
+    const notaSnapshot = await db.collection('notaItems').get();
+    notaItems = [];
+    notaSnapshot.forEach(doc => {
+      notaItems.push({ id: doc.id, ...doc.data() });
+    });
+
+    syncEnabled = true;
+    renderProducts();
+    renderOrders();
+    renderReport();
+    console.log('Data loaded from Firestore');
+  } catch (error) {
+    console.error('Error loading data:', error);
+    // Fallback to localStorage
+    products = JSON.parse(localStorage.getItem('products')) || [
+      { id: 1, name: 'Produk A', price: 15000, stock: 20 },
+      { id: 2, name: 'Produk B', price: 28000, stock: 15 },
+      { id: 3, name: 'Produk C', price: 12000, stock: 30 },
+    ];
+    notaItems = JSON.parse(localStorage.getItem('notaItems')) || [];
+    orders = JSON.parse(localStorage.getItem('orders')) || [];
+    renderProducts();
+    renderOrders();
+    renderReport();
+  }
+}
 
 function saveData() {
+  // Save to localStorage
   localStorage.setItem('products', JSON.stringify(products));
   localStorage.setItem('notaItems', JSON.stringify(notaItems));
   localStorage.setItem('orders', JSON.stringify(orders));
+  
+  // Sync to Firestore if available
+  if (syncEnabled) {
+    syncDataToFirestore();
+  }
+}
+
+async function syncDataToFirestore() {
+  try {
+    // Sync Products
+    const productsRef = db.collection('products');
+    const existingProducts = await productsRef.get();
+    const existingIds = new Set(existingProducts.docs.map(doc => doc.id));
+    
+    for (const product of products) {
+      if (existingIds.has(String(product.id))) {
+        await productsRef.doc(String(product.id)).set(product);
+      } else {
+        await productsRef.doc(String(product.id)).set(product);
+      }
+    }
+  } catch (error) {
+    console.error('Error syncing to Firestore:', error);
+  }
 }
 
 function showPage(pageId) {
@@ -248,3 +330,6 @@ renderProducts();
 renderOrders();
 renderReport();
 showPage('kasir');
+
+// Load data from Firestore on page load
+loadDataFromFirestore();
